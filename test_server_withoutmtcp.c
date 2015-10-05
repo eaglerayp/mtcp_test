@@ -215,9 +215,7 @@ InitializeServerThread(int core)
    }
 
    CPU_ZERO(&cpus);
-   printf("use core: %d\n", core);
    CPU_SET((unsigned)core, &cpus);
-
    ret = sched_setaffinity(Gettid(), sizeof(cpus), &cpus);
 
    ctx = (struct thread_context *)calloc(1, sizeof(struct thread_context));
@@ -375,9 +373,9 @@ int main(int argc, char *argv[] )
    num_cores = GetNumCPUs();
    core_limit = 1;
    int cores[MAX_CPUS];
-   printf("core_limits:%d\n", core_limit);
+   //printf("core_limits:%d\n", core_limit);
    for (i = 0; i < core_limit; i++) {
-      cores[i] = i + 5;
+      cores[i] = i;
       if (pthread_create(&app_thread[i],
                          NULL, RunServerThread, (void *)&cores[i])) {
          perror("pthread_create");
