@@ -174,7 +174,7 @@ CreateListeningSocket(struct thread_context *ctx)
    }
 
    /* wait for incoming accept events */
-   ev.events = MTCP_EPOLLIN;
+   ev.events = MTCP_EPOLLIN | MTCP_EPOLLET;
    ev.data.sockid = listener;
    mtcp_epoll_ctl(ctx->mctx, ctx->ep, MTCP_EPOLL_CTL_ADD, listener, &ev);
 
@@ -255,7 +255,6 @@ RunServerThread(void *arg) //arg = core num
    */
    listener = CreateListeningSocket(ctx);
    printf("listener:%d\n", listener);
-   printf("mctx:%d\n", *(int *)mctx);
    printf("ep:%d\n", ep);
    if (listener < 0) {
       printf("Failed to create listening socket.\n");
@@ -326,13 +325,13 @@ RunServerThread(void *arg) //arg = core num
                }
                struct mtcp_epoll_event ev;
                connect++;
-               // printf("New connection %d accepted. total: %d\n", c,connect);
-               ev.events = MTCP_EPOLLIN | MTCP_EPOLLOUT;
+               //accept connection and wait EPOLLIN EVENT
+               ev.events = MTCP_EPOLLIN | MTCP_EPOLLET;
                ev.data.sockid = c;
                mtcp_setsock_nonblock(ctx->mctx, c);
                mtcp_epoll_ctl(mctx, ctx->ep, MTCP_EPOLL_CTL_ADD, c, &ev);
                //      printf("Socket %d registered.\n", c);
-            } else {
+            } else {  //c<0
                /*     printf("mtcp_accept() error %s\n",
                           strerror(errno));*/
                break;

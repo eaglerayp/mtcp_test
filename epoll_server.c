@@ -191,7 +191,7 @@ CreateListeningSocket(struct thread_context *ctx)
    }
 
    /* wait for incoming accept events */
-   ev.events = EPOLLIN;
+   ev.events = EPOLLIN | EPOLLET;
    ev.data.fd = listener;
    epoll_ctl(ctx->ep, EPOLL_CTL_ADD, listener, &ev);
 
@@ -333,7 +333,7 @@ RunServerThread(void *arg) //arg = core num
             close(sockid);
          }
       }//end for
-      if (do_accept) {
+      if (do_accept) {  //epoll accept  
          while (1) {
             int c = accept(listener, NULL, NULL);
             if (c >= 0) {
@@ -346,15 +346,15 @@ RunServerThread(void *arg) //arg = core num
                }
                struct epoll_event ev;
                connect++;
-               // printf("New connection %d accepted. total: %d\n", c,connect);
+               //accept connection and wait EPOLLIN EVENT
                ev.events = EPOLLIN | EPOLLET;
                ev.data.fd = c;
                epoll_ctl(ctx->ep, EPOLL_CTL_ADD, c, &ev);
                //      printf("Socket %d registered.\n", c);
-            } else {
+            } else {  //c<0
                if (errno != EAGAIN && errno != ECONNABORTED
                      && errno != EPROTO && errno != EINTR) {
-                  printf("accept() error %s\n",
+                         printf("accept() error %s\n",
                          strerror(errno));
                }
                break;
