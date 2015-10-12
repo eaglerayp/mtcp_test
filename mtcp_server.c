@@ -157,10 +157,6 @@ CreateListeningSocket(struct thread_context *ctx)
    saddr.sin_port = htons(8080);
    ret = mtcp_bind(ctx->mctx, listener,
                    (struct sockaddr *)&saddr, sizeof(struct sockaddr_in));
-   struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&saddr;
-   int ipAddr = pV4Addr->sin_addr.s_addr;
-   char ipstr[INET_ADDRSTRLEN];
-   inet_ntop( AF_INET, &ipAddr, ipstr, INET_ADDRSTRLEN );
    if (ret < 0) {
       printf("Failed to bind to the listening socket!\n");
       return -1;
